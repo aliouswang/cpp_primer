@@ -10,16 +10,27 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include "ourhdr.h"
+#include "fcntl.h"
+
+#define BUFFSIZE 8192
 
 int main(int argc, const char * argv[]) {
-//    printf("Hello unix senior! params:%s\n", argv[0]);
+    int n;
+    char buf[BUFFSIZE];
     
-    DIR *dp;
-    struct dirent *dirp;
-    
-    if(argc != 2) {
-        err_quit("a single argument is required");
+    int stdin = open("/Users/aliouswang/Desktop/stdin", O_RDWR);
+    int stdout = open("/Users/aliouswang/Desktop/stdout", O_RDWR);
+    printf("current process id: %d\n", getpid());
+    printf("copy start!");
+    while((n = read(stdin, buf, BUFFSIZE)) > 0) {
+        if(write(stdout, buf, n) != n) {
+            err_sys("write error");
+        }
     }
     
+    if (n < 0) {
+        err_sys("read error");
+    }
+    printf("copy finished!");
     return 0;
 }
